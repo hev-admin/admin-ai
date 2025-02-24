@@ -1,0 +1,26 @@
+{
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "element-plus": "^2.6.1",
+    "pinia": "^2.1.7",
+    "vue": "^3.5.13",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@unocss/preset-attributify": "^0.58.5",
+    "@unocss/preset-icons": "^0.58.5",
+    "@unocss/preset-uno": "^0.58.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "unocss": "^0.58.5",
+    "vite": "^6.1.0"
+  }
+}
