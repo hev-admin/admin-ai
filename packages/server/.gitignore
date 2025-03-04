@@ -1,11 +1,9 @@
+.env
+.env.local
+.env.*.local
+
 # dependencies
 node_modules
-.pnpm-store
-
-# build output
-dist
-.temp
-.cache
 
 # logs
 logs

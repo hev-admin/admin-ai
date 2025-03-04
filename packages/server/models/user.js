@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../config/database.js'
 
 const User = sequelize.define('User', {
   id: {
@@ -18,24 +18,23 @@ const User = sequelize.define('User', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: true,
     validate: {
       isEmail: true
     }
   },
   role: {
     type: DataTypes.STRING,
-    allowNull: false,
     defaultValue: 'user'
   },
-  status: {
-    type: DataTypes.ENUM('active', 'inactive'),
-    defaultValue: 'active'
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-}, {
-  tableName: 'users',
-  modelName: 'User'
-});
+})
 
-export default User;
+export default User
