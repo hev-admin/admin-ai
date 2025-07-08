@@ -1,0 +1,15 @@
+packages:
+  - packages/*
+  - docs
+
+ignoredBuiltDependencies:
+  - simple-git-hooks
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - better-sqlite3
+  - esbuild
+  - prisma
+  - unrs-resolver
+  - vue-demi

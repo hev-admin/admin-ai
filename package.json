@@ -1,0 +1,35 @@
+{
+  "name": "admin-ai",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:docs": "pnpm --filter docs dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . --concurrency=auto",
+    "lint:fix": "eslint . --fix --concurrency=auto",
+    "test": "pnpm -r test",
+    "test:run": "pnpm -r test:run",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.14.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-format": "^1.3.1",
+    "lint-staged": "^16.2.7",
+    "simple-git-hooks": "^2.13.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue}": "eslint --fix --concurrency=auto",
+    "*.{json,md,css,html,yaml,yml}": "eslint --fix --concurrency=auto"
+  }
+}
