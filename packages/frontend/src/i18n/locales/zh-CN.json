@@ -1,0 +1,93 @@
+{
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "search": "搜索",
+    "reset": "重置",
+    "submit": "提交",
+    "back": "返回",
+    "loading": "加载中...",
+    "success": "操作成功",
+    "failed": "操作失败",
+    "requestFailed": "请求失败",
+    "noData": "暂无数据",
+    "actions": "操作",
+    "status": "状态",
+    "enable": "启用",
+    "disable": "禁用",
+    "yes": "是",
+    "no": "否"
+  },
+  "auth": {
+    "login": "登录",
+    "logout": "退出登录",
+    "register": "注册",
+    "username": "用户名",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "email": "邮箱",
+    "phone": "手机号",
+    "captcha": "验证码",
+    "rememberMe": "记住我",
+    "forgotPassword": "忘记密码?",
+    "loginSuccess": "登录成功",
+    "logoutSuccess": "退出成功",
+    "registerSuccess": "注册成功",
+    "pleaseInputUsername": "请输入用户名",
+    "pleaseInputPassword": "请输入密码",
+    "pleaseInputEmail": "请输入邮箱",
+    "passwordNotMatch": "两次密码输入不一致"
+  },
+  "menu": {
+    "dashboard": "仪表盘",
+    "system": "系统管理",
+    "user": "用户管理",
+    "role": "角色管理",
+    "menu": "菜单管理",
+    "log": "日志管理",
+    "setting": "系统设置",
+    "profile": "个人中心"
+  },
+  "user": {
+    "userManagement": "用户管理",
+    "addUser": "添加用户",
+    "editUser": "编辑用户",
+    "deleteUser": "删除用户",
+    "username": "用户名",
+    "nickname": "昵称",
+    "email": "邮箱",
+    "phone": "手机号",
+    "status": "状态",
+    "role": "角色",
+    "createdAt": "创建时间",
+    "lastLogin": "最后登录"
+  },
+  "role": {
+    "roleManagement": "角色管理",
+    "addRole": "添加角色",
+    "editRole": "编辑角色",
+    "deleteRole": "删除角色",
+    "roleName": "角色名称",
+    "roleCode": "角色编码",
+    "description": "描述",
+    "permissions": "权限"
+  },
+  "settings": {
+    "theme": "主题",
+    "language": "语言",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式"
+  },
+  "error": {
+    "notFound": "页面不存在",
+    "forbidden": "无权限访问",
+    "serverError": "服务器错误",
+    "networkError": "网络错误",
+    "timeout": "请求超时",
+    "backToHome": "返回首页"
+  }
+}

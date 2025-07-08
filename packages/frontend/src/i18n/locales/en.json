@@ -1,0 +1,93 @@
+{
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "reset": "Reset",
+    "submit": "Submit",
+    "back": "Back",
+    "loading": "Loading...",
+    "success": "Success",
+    "failed": "Failed",
+    "requestFailed": "Request failed",
+    "noData": "No data",
+    "actions": "Actions",
+    "status": "Status",
+    "enable": "Enable",
+    "disable": "Disable",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "email": "Email",
+    "phone": "Phone",
+    "captcha": "Captcha",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "registerSuccess": "Registration successful",
+    "pleaseInputUsername": "Please enter username",
+    "pleaseInputPassword": "Please enter password",
+    "pleaseInputEmail": "Please enter email",
+    "passwordNotMatch": "Passwords do not match"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "system": "System",
+    "user": "Users",
+    "role": "Roles",
+    "menu": "Menus",
+    "log": "Logs",
+    "setting": "Settings",
+    "profile": "Profile"
+  },
+  "user": {
+    "userManagement": "User Management",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "username": "Username",
+    "nickname": "Nickname",
+    "email": "Email",
+    "phone": "Phone",
+    "status": "Status",
+    "role": "Role",
+    "createdAt": "Created At",
+    "lastLogin": "Last Login"
+  },
+  "role": {
+    "roleManagement": "Role Management",
+    "addRole": "Add Role",
+    "editRole": "Edit Role",
+    "deleteRole": "Delete Role",
+    "roleName": "Role Name",
+    "roleCode": "Role Code",
+    "description": "Description",
+    "permissions": "Permissions"
+  },
+  "settings": {
+    "theme": "Theme",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "error": {
+    "notFound": "Page not found",
+    "forbidden": "Access denied",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "timeout": "Request timeout",
+    "backToHome": "Back to Home"
+  }
+}
