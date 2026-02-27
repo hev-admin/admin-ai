@@ -121,7 +121,7 @@ async function createMenus() {
   // 用户管理
   const user = await prisma.menu.upsert({
     where: { id: 'system-user' },
-    update: {},
+    update: { permission: 'system:user:list' },
     create: {
       id: 'system-user',
       parentId: 'system',
@@ -129,6 +129,7 @@ async function createMenus() {
       path: '/system/user',
       title: '用户管理',
       icon: 'i-lucide-users',
+      permission: 'system:user:list',
       type: 2,
       sort: 0,
     },
@@ -138,7 +139,7 @@ async function createMenus() {
   // 角色管理
   const role = await prisma.menu.upsert({
     where: { id: 'system-role' },
-    update: {},
+    update: { permission: 'system:role:list' },
     create: {
       id: 'system-role',
       parentId: 'system',
@@ -146,6 +147,7 @@ async function createMenus() {
       path: '/system/role',
       title: '角色管理',
       icon: 'i-lucide-shield',
+      permission: 'system:role:list',
       type: 2,
       sort: 1,
     },
@@ -155,7 +157,7 @@ async function createMenus() {
   // 菜单管理
   const menu = await prisma.menu.upsert({
     where: { id: 'system-menu' },
-    update: {},
+    update: { permission: 'system:menu:list' },
     create: {
       id: 'system-menu',
       parentId: 'system',
@@ -163,6 +165,7 @@ async function createMenus() {
       path: '/system/menu',
       title: '菜单管理',
       icon: 'i-lucide-menu',
+      permission: 'system:menu:list',
       type: 2,
       sort: 2,
     },
@@ -172,7 +175,7 @@ async function createMenus() {
   // 操作日志
   const log = await prisma.menu.upsert({
     where: { id: 'system-log' },
-    update: {},
+    update: { permission: 'system:log:view' },
     create: {
       id: 'system-log',
       parentId: 'system',
@@ -180,6 +183,7 @@ async function createMenus() {
       path: '/system/log',
       title: '操作日志',
       icon: 'i-lucide-file-text',
+      permission: 'system:log:view',
       type: 2,
       sort: 3,
     },
@@ -189,7 +193,7 @@ async function createMenus() {
   // 系统设置
   const setting = await prisma.menu.upsert({
     where: { id: 'system-setting' },
-    update: {},
+    update: { permission: 'system:setting:view' },
     create: {
       id: 'system-setting',
       parentId: 'system',
@@ -197,6 +201,7 @@ async function createMenus() {
       path: '/system/setting',
       title: '系统设置',
       icon: 'i-lucide-sliders',
+      permission: 'system:setting:view',
       type: 2,
       sort: 4,
     },
