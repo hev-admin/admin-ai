@@ -1,7 +1,10 @@
+import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { authMiddleware } from '../middleware/auth.js'
+import { permissionMiddleware } from '../middleware/permission.js'
 import { roleService } from '../services/role.js'
 import { error, paginate, success } from '../utils/response.js'
+import { batchDeleteRoleSchema, createRoleSchema, updateRoleSchema } from '../validators/role.js'
 
 const role = new Hono()
 
@@ -26,9 +29,9 @@ role.get('/:id', async (c) => {
   return role ? c.json(success(role)) : c.json(error('角色不存在'), 404)
 })
 
-role.post('/', async (c) => {
+role.post('/', permissionMiddleware('system:role:create'), zValidator('json', createRoleSchema), async (c) => {
   try {
-    const data = await c.req.json()
+    const data = c.req.valid('json')
     const role = await roleService.create(data)
     return c.json(success(role, '创建成功'))
   }
@@ -37,9 +40,9 @@ role.post('/', async (c) => {
   }
 })
 
-role.put('/:id', async (c) => {
+role.put('/:id', permissionMiddleware('system:role:update'), zValidator('json', updateRoleSchema), async (c) => {
   try {
-    const data = await c.req.json()
+    const data = c.req.valid('json')
     const role = await roleService.update(c.req.param('id'), data)
     return c.json(success(role, '更新成功'))
   }
@@ -48,7 +51,7 @@ role.put('/:id', async (c) => {
   }
 })
 
-role.delete('/:id', async (c) => {
+role.delete('/:id', permissionMiddleware('system:role:delete'), async (c) => {
   try {
     await roleService.delete(c.req.param('id'))
     return c.json(success(null, '删除成功'))
@@ -58,12 +61,9 @@ role.delete('/:id', async (c) => {
   }
 })
 
-role.post('/batch-delete', async (c) => {
+role.post('/batch-delete', permissionMiddleware('system:role:delete'), zValidator('json', batchDeleteRoleSchema), async (c) => {
   try {
-    const { ids } = await c.req.json()
-    if (!ids || !ids.length) {
-      return c.json(error('请选择要删除的角色'), 400)
-    }
+    const { ids } = c.req.valid('json')
     await roleService.batchDelete(ids)
     return c.json(success(null, '批量删除成功'))
   }

@@ -2,9 +2,10 @@
 
 ## 基础信息
 
-- **基础路径**: `/api`
+- **基础路径**: `/api/v1` (也支持 `/api` 兼容旧版)
 - **认证方式**: Bearer Token (JWT)
 - **响应格式**: JSON
+- **数据验证**: Zod Schema（所有写入接口）
 
 ## 响应结构
 
@@ -25,15 +26,46 @@
 | 200    | 请求成功     |
 | 400    | 请求参数错误 |
 | 401    | 未授权       |
+| 403    | 无操作权限   |
 | 404    | 资源不存在   |
+| 429    | 请求频率超限 |
 | 500    | 服务器错误   |
 
 ## 认证
 
-除登录和注册接口外，其他接口都需要在请求头中携带 Token：
+除登录、注册和健康检查外，其他接口都需要在请求头中携带 Token：
 
 ```
 Authorization: Bearer <token>
+```
+
+## 速率限制
+
+所有 API 接口受速率限制保护，限制信息通过响应头返回：
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1700000000
+```
+
+## 权限控制
+
+写入接口（POST/PUT/DELETE）受 RBAC 权限校验保护，需要对应的权限标识。
+
+## 健康检查
+
+```
+GET /health
+```
+
+无需认证。返回服务状态：
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-01T00:00:00.000Z"
+}
 ```
 
 ## 接口模块
@@ -64,7 +96,7 @@ POST /api/auth/login
 | 参数     | 类型   | 必填 | 说明            |
 | -------- | ------ | ---- | --------------- |
 | username | string | 是   | 用户名          |
-| password | string | 是   | 密码（至少6位） |
+| password | string | 是   | 密码（至少8位） |
 
 **响应示例**
 
@@ -96,8 +128,32 @@ POST /api/auth/register
 | -------- | ------ | ---- | ----------------- |
 | username | string | 是   | 用户名（至少3位） |
 | email    | string | 是   | 邮箱              |
-| password | string | 是   | 密码（至少6位）   |
+| password | string | 是   | 密码（至少8位）   |
 | nickname | string | 否   | 昵称              |
+
+### 刷新 Token
+
+```
+POST /api/auth/refresh
+```
+
+**请求参数**
+
+| 参数         | 类型   | 必填 | 说明          |
+| ------------ | ------ | ---- | ------------- |
+| refreshToken | string | 是   | Refresh Token |
+
+**响应示例**
+
+```json
+{
+  "code": 200,
+  "data": {
+    "token": "new-access-token...",
+    "user": { "id": "1", "username": "admin" }
+  }
+}
+```
 
 ### 获取个人信息
 
@@ -385,11 +441,21 @@ POST /api/menus/batch-delete
 GET /api/settings
 ```
 
+### 按分组获取设置
+
+```
+GET /api/settings/group/:group
+```
+
+返回指定分组的设置项列表。
+
 ### 批量更新设置
 
 ```
 PUT /api/settings
 ```
+
+**需要权限**: `system:setting:update`
 
 **请求参数**
 
@@ -414,12 +480,36 @@ GET /api/logs
 
 **查询参数**
 
-| 参数     | 类型   | 必填 | 说明              |
-| -------- | ------ | ---- | ----------------- |
-| page     | number | 否   | 页码，默认 1      |
-| pageSize | number | 否   | 每页数量，默认 20 |
-| module   | string | 否   | 模块筛选          |
-| username | string | 否   | 用户名筛选        |
+| 参数      | 类型   | 必填 | 说明                                        |
+| --------- | ------ | ---- | ------------------------------------------- |
+| page      | number | 否   | 页码，默认 1                                |
+| pageSize  | number | 否   | 每页数量，默认 20                           |
+| module    | string | 否   | 模块筛选                                    |
+| username  | string | 否   | 用户名筛选                                  |
+| startDate | string | 否   | 开始日期 (ISO 格式)                         |
+| endDate   | string | 否   | 结束日期 (ISO 格式)                         |
+| sortField | string | 否   | 排序字段 (createdAt/duration/module/action) |
+| sortOrder | string | 否   | 排序方向 (asc/desc，默认 desc)              |
+
+### 获取日志统计
+
+```
+GET /api/logs/stats
+```
+
+**需要权限**: `system:log:view`
+
+**响应示例**
+
+```json
+{
+  "code": 200,
+  "data": {
+    "total": 1234,
+    "todayCount": 56
+  }
+}
+```
 
 ---
 

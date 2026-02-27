@@ -15,6 +15,7 @@ const checkedRowKeys = ref([])
 const modalVisible = ref(false)
 const modalTitle = ref('新增菜单')
 const formLoading = ref(false)
+const formRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -34,6 +35,24 @@ const formData = reactive({
   keepAlive: 0,
   external: 0,
 })
+
+// 表单验证规则
+const formRules = {
+  title: [
+    { required: true, message: '请输入菜单标题', trigger: 'blur' },
+    { max: 50, message: '标题不能超过50个字符', trigger: 'blur' },
+  ],
+  name: [
+    { required: true, message: '请输入路由名称', trigger: 'blur' },
+    { max: 50, message: '名称不能超过50个字符', trigger: 'blur' },
+  ],
+  path: [
+    { max: 200, message: '路径不能超过200个字符', trigger: 'blur' },
+  ],
+  permission: [
+    { max: 100, message: '权限标识不能超过100个字符', trigger: 'blur' },
+  ],
+}
 
 // 扁平化菜单树用于表格展示
 const flattenedMenus = computed(() => {
@@ -211,6 +230,13 @@ async function handleEdit(menu) {
 
 // 提交表单
 async function handleSubmit() {
+  try {
+    await formRef.value?.validate()
+  }
+  catch {
+    return
+  }
+
   formLoading.value = true
   try {
     const data = {
@@ -339,6 +365,7 @@ onMounted(() => {
         :loading="loading"
         :row-key="row => row.id"
       />
+      <n-empty v-if="!loading && flattenedMenus.length === 0" description="暂无数据" mt-4 />
     </n-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -348,7 +375,7 @@ onMounted(() => {
       :title="modalTitle"
       style="width: 650px"
     >
-      <n-form label-placement="left" label-width="80">
+      <n-form ref="formRef" :model="formData" :rules="formRules" label-placement="left" label-width="80">
         <n-grid :cols="2" :x-gap="16">
           <n-gi>
             <n-form-item label="上级菜单">
@@ -356,7 +383,7 @@ onMounted(() => {
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="菜单类型" required>
+            <n-form-item label="菜单类型">
               <n-select v-model:value="formData.type" :options="typeOptions" />
             </n-form-item>
           </n-gi>
@@ -364,12 +391,12 @@ onMounted(() => {
 
         <n-grid :cols="2" :x-gap="16">
           <n-gi>
-            <n-form-item label="菜单标题" required>
+            <n-form-item label="菜单标题" path="title">
               <n-input v-model:value="formData.title" placeholder="请输入菜单标题" />
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="路由名称" required>
+            <n-form-item label="路由名称" path="name">
               <n-input v-model:value="formData.name" placeholder="请输入路由名称" />
             </n-form-item>
           </n-gi>
@@ -377,7 +404,7 @@ onMounted(() => {
 
         <n-grid v-if="formData.type !== 3" :cols="2" :x-gap="16">
           <n-gi>
-            <n-form-item label="路由路径">
+            <n-form-item label="路由路径" path="path">
               <n-input v-model:value="formData.path" placeholder="请输入路由路径" />
             </n-form-item>
           </n-gi>
@@ -401,7 +428,7 @@ onMounted(() => {
           </n-gi>
         </n-grid>
 
-        <n-form-item label="权限标识">
+        <n-form-item label="权限标识" path="permission">
           <n-input v-model:value="formData.permission" placeholder="如: system:user:add" />
         </n-form-item>
 

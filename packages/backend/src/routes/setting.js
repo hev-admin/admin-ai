@@ -1,7 +1,10 @@
+import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { authMiddleware } from '../middleware/auth.js'
+import { permissionMiddleware } from '../middleware/permission.js'
 import { settingService } from '../services/setting.js'
 import { error, success } from '../utils/response.js'
+import { batchSetSettingSchema } from '../validators/setting.js'
 
 const setting = new Hono()
 
@@ -12,9 +15,15 @@ setting.get('/', async (c) => {
   return c.json(success(settings))
 })
 
-setting.put('/', async (c) => {
+setting.get('/group/:group', async (c) => {
+  const group = c.req.param('group')
+  const settings = await settingService.getByGroup(group)
+  return c.json(success(settings))
+})
+
+setting.put('/', permissionMiddleware('system:setting:update'), zValidator('json', batchSetSettingSchema), async (c) => {
   try {
-    const { settings } = await c.req.json()
+    const { settings } = c.req.valid('json')
     await settingService.batchSet(settings)
     return c.json(success(null, '保存成功'))
   }

@@ -8,7 +8,7 @@ export const loginSchema = z.object({
     .min(1, '用户名不能为空')
     .max(50, '用户名不能超过50个字符'),
   password: z.string()
-    .min(6, '密码至少6位')
+    .min(8, '密码至少8位')
     .max(100, '密码不能超过100个字符'),
 })
 
@@ -45,7 +45,7 @@ export const updateProfileSchema = z.object({
 
 export const changePasswordSchema = z.object({
   oldPassword: z.string()
-    .min(6, '原密码至少6位'),
+    .min(8, '原密码至少8位'),
   newPassword: z.string()
     .min(8, '新密码至少8位')
     .max(100, '密码不能超过100个字符')

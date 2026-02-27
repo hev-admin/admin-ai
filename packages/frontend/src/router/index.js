@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
+import { usePermissionStore } from '@/stores/permission.js'
 import { useTabsStore } from '@/stores/tabs.js'
 
 const routes = [
@@ -30,31 +31,31 @@ const routes = [
         path: 'system/user',
         name: 'UserManagement',
         component: () => import('@/pages/system/user/IndexPage.vue'),
-        meta: { title: '用户管理', icon: 'i-lucide-users', keepAlive: true },
+        meta: { title: '用户管理', icon: 'i-lucide-users', keepAlive: true, permission: 'system:user:list' },
       },
       {
         path: 'system/role',
         name: 'RoleManagement',
         component: () => import('@/pages/system/role/IndexPage.vue'),
-        meta: { title: '角色管理', icon: 'i-lucide-shield', keepAlive: true },
+        meta: { title: '角色管理', icon: 'i-lucide-shield', keepAlive: true, permission: 'system:role:list' },
       },
       {
         path: 'system/menu',
         name: 'MenuManagement',
         component: () => import('@/pages/system/menu/IndexPage.vue'),
-        meta: { title: '菜单管理', icon: 'i-lucide-menu', keepAlive: true },
+        meta: { title: '菜单管理', icon: 'i-lucide-menu', keepAlive: true, permission: 'system:menu:list' },
       },
       {
         path: 'system/log',
         name: 'LogManagement',
         component: () => import('@/pages/system/log/IndexPage.vue'),
-        meta: { title: '日志管理', icon: 'i-lucide-file-text', keepAlive: true },
+        meta: { title: '日志管理', icon: 'i-lucide-file-text', keepAlive: true, permission: 'system:log:view' },
       },
       {
         path: 'system/setting',
         name: 'SystemSetting',
         component: () => import('@/pages/system/setting/IndexPage.vue'),
-        meta: { title: '系统设置', icon: 'i-lucide-settings', keepAlive: true },
+        meta: { title: '系统设置', icon: 'i-lucide-settings', keepAlive: true, permission: 'system:setting:view' },
       },
       {
         path: 'profile',
@@ -77,18 +78,43 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  const permissionStore = usePermissionStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
+    return
   }
-  else if (!to.meta.requiresAuth && authStore.isAuthenticated && (to.name === 'Login' || to.name === 'Register')) {
+
+  if (!to.meta.requiresAuth && authStore.isAuthenticated && (to.name === 'Login' || to.name === 'Register')) {
     next({ name: 'Dashboard' })
+    return
   }
-  else {
-    next()
+
+  // Load user info and permissions if authenticated but not loaded
+  if (authStore.isAuthenticated && !permissionStore.loaded) {
+    try {
+      await authStore.fetchUser()
+      await permissionStore.init()
+    }
+    catch {
+      authStore.logout()
+      permissionStore.reset()
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
   }
+
+  // Check route-level permission
+  if (to.meta.permission && authStore.isAuthenticated) {
+    if (!permissionStore.hasPermission(to.meta.permission)) {
+      next({ name: 'NotFound' })
+      return
+    }
+  }
+
+  next()
 })
 
 // 路由变化后自动添加 tab

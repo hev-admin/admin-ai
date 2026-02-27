@@ -1,20 +1,19 @@
+import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { authMiddleware } from '../middleware/auth.js'
+import { permissionMiddleware } from '../middleware/permission.js'
 import { userService } from '../services/user.js'
 import { error, paginate, success } from '../utils/response.js'
+import { batchDeleteSchema, createUserSchema, listQuerySchema, updateUserSchema } from '../validators/user.js'
 
 const user = new Hono()
 
 user.use('*', authMiddleware())
 
-user.get('/', async (c) => {
-  const { page = 1, pageSize = 10, keyword = '' } = c.req.query()
-  const { list, total } = await userService.getList(
-    Number(page),
-    Number(pageSize),
-    keyword,
-  )
-  return c.json(paginate(list, Number(page), Number(pageSize), total))
+user.get('/', zValidator('query', listQuerySchema), async (c) => {
+  const { page, pageSize, keyword } = c.req.valid('query')
+  const { list, total } = await userService.getList(page, pageSize, keyword)
+  return c.json(paginate(list, page, pageSize, total))
 })
 
 user.get('/:id', async (c) => {
@@ -22,9 +21,9 @@ user.get('/:id', async (c) => {
   return user ? c.json(success(user)) : c.json(error('用户不存在'), 404)
 })
 
-user.post('/', async (c) => {
+user.post('/', permissionMiddleware('system:user:create'), zValidator('json', createUserSchema), async (c) => {
   try {
-    const data = await c.req.json()
+    const data = c.req.valid('json')
     const user = await userService.create(data)
     return c.json(success(user, '创建成功'))
   }
@@ -33,9 +32,9 @@ user.post('/', async (c) => {
   }
 })
 
-user.put('/:id', async (c) => {
+user.put('/:id', permissionMiddleware('system:user:update'), zValidator('json', updateUserSchema), async (c) => {
   try {
-    const data = await c.req.json()
+    const data = c.req.valid('json')
     const user = await userService.update(c.req.param('id'), data)
     return c.json(success(user, '更新成功'))
   }
@@ -44,7 +43,7 @@ user.put('/:id', async (c) => {
   }
 })
 
-user.delete('/:id', async (c) => {
+user.delete('/:id', permissionMiddleware('system:user:delete'), async (c) => {
   try {
     await userService.delete(c.req.param('id'))
     return c.json(success(null, '删除成功'))
@@ -54,12 +53,9 @@ user.delete('/:id', async (c) => {
   }
 })
 
-user.post('/batch-delete', async (c) => {
+user.post('/batch-delete', permissionMiddleware('system:user:delete'), zValidator('json', batchDeleteSchema), async (c) => {
   try {
-    const { ids } = await c.req.json()
-    if (!ids || !ids.length) {
-      return c.json(error('请选择要删除的用户'), 400)
-    }
+    const { ids } = c.req.valid('json')
     await userService.batchDelete(ids)
     return c.json(success(null, '批量删除成功'))
   }

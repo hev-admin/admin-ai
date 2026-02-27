@@ -16,6 +16,7 @@ const checkedRowKeys = ref([])
 const modalVisible = ref(false)
 const modalTitle = ref('新增角色')
 const formLoading = ref(false)
+const formRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -27,6 +28,22 @@ const formData = reactive({
   sort: 0,
   menuIds: [],
 })
+
+// 表单验证规则
+const formRules = {
+  name: [
+    { required: true, message: '请输入角色名称', trigger: 'blur' },
+    { max: 50, message: '角色名称不能超过50个字符', trigger: 'blur' },
+  ],
+  code: [
+    { required: true, message: '请输入角色标识', trigger: 'blur' },
+    { max: 50, message: '角色标识不能超过50个字符', trigger: 'blur' },
+    { pattern: /^[a-z]\w*$/i, message: '以字母开头，只能包含字母、数字和下划线', trigger: 'blur' },
+  ],
+  description: [
+    { max: 200, message: '描述不能超过200个字符', trigger: 'blur' },
+  ],
+}
 
 // 表格列定义
 const columns = [
@@ -127,6 +144,13 @@ async function handleEdit(role) {
 
 // 提交表单
 async function handleSubmit() {
+  try {
+    await formRef.value?.validate()
+  }
+  catch {
+    return
+  }
+
   formLoading.value = true
   try {
     const data = {
@@ -244,6 +268,7 @@ onMounted(() => {
         :loading="loading"
         :row-key="row => row.id"
       />
+      <n-empty v-if="!loading && roles.length === 0" description="暂无数据" mt-4 />
     </n-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -253,15 +278,15 @@ onMounted(() => {
       :title="modalTitle"
       style="width: 600px"
     >
-      <n-form label-placement="left" label-width="80">
+      <n-form ref="formRef" :model="formData" :rules="formRules" label-placement="left" label-width="80">
         <n-grid :cols="2" :x-gap="16">
           <n-gi>
-            <n-form-item label="角色名称" required>
+            <n-form-item label="角色名称" path="name">
               <n-input v-model:value="formData.name" placeholder="请输入角色名称" />
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="角色标识" required>
+            <n-form-item label="角色标识" path="code">
               <n-input
                 v-model:value="formData.code"
                 :disabled="!!formData.id"
@@ -271,7 +296,7 @@ onMounted(() => {
           </n-gi>
         </n-grid>
 
-        <n-form-item label="描述">
+        <n-form-item label="描述" path="description">
           <n-input
             v-model:value="formData.description"
             type="textarea"

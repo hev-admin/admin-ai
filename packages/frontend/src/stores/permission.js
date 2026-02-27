@@ -6,6 +6,8 @@ export const usePermissionStore = defineStore('permission', () => {
   const menus = ref([])
   const permissions = ref([])
   const loaded = ref(false)
+  const loading = ref(false)
+  const error = ref(null)
 
   async function loadUserMenus() {
     const res = await menuApi.getUserMenus()
@@ -19,7 +21,18 @@ export const usePermissionStore = defineStore('permission', () => {
   }
 
   async function init() {
-    await Promise.all([loadUserMenus(), loadUserPermissions()])
+    loading.value = true
+    error.value = null
+    try {
+      await Promise.all([loadUserMenus(), loadUserPermissions()])
+    }
+    catch (e) {
+      error.value = e.message || '加载权限失败'
+      throw e
+    }
+    finally {
+      loading.value = false
+    }
   }
 
   function hasPermission(permission) {
@@ -30,12 +43,16 @@ export const usePermissionStore = defineStore('permission', () => {
     menus.value = []
     permissions.value = []
     loaded.value = false
+    loading.value = false
+    error.value = null
   }
 
   return {
     menus,
     permissions,
     loaded,
+    loading,
+    error,
     loadUserMenus,
     loadUserPermissions,
     init,

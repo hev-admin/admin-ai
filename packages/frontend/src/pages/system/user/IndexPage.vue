@@ -12,11 +12,13 @@ const roles = ref([])
 const loading = ref(false)
 const pagination = reactive({ page: 1, pageSize: 10, itemCount: 0 })
 const checkedRowKeys = ref([])
+const searchKeyword = ref('')
 
 // 弹窗状态
 const modalVisible = ref(false)
 const modalTitle = ref('新增用户')
 const formLoading = ref(false)
+const formRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -29,6 +31,29 @@ const formData = reactive({
   status: 1,
   roleIds: [],
 })
+
+// 表单验证规则
+const formRules = computed(() => ({
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 3, max: 50, message: '用户名3-50个字符', trigger: 'blur' },
+    { pattern: /^\w+$/, message: '只能包含字母、数字和下划线', trigger: 'blur' },
+  ],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' },
+  ],
+  password: formData.id
+    ? []
+    : [
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { min: 8, max: 100, message: '密码至少8位', trigger: 'blur' },
+        { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: '需包含大小写字母和数字', trigger: 'blur' },
+      ],
+  phone: [
+    { pattern: /^\d{11}$/, message: '手机号格式不正确', trigger: 'blur' },
+  ],
+}))
 
 // 表格列定义
 const columns = [
@@ -93,6 +118,7 @@ async function fetchUsers() {
     const res = await userApi.getList({
       page: pagination.page,
       pageSize: pagination.pageSize,
+      keyword: searchKeyword.value,
     })
     users.value = res.data.list
     pagination.itemCount = res.data.pagination.total
@@ -106,6 +132,16 @@ async function fetchUsers() {
 async function fetchRoles() {
   const res = await roleApi.getAll()
   roles.value = res.data
+}
+
+// 搜索
+let searchTimer = null
+function handleSearch() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    pagination.page = 1
+    fetchUsers()
+  }, 300)
 }
 
 // 分页改变
@@ -137,13 +173,20 @@ function handleEdit(user) {
 
 // 提交表单
 async function handleSubmit() {
+  try {
+    await formRef.value?.validate()
+  }
+  catch {
+    return
+  }
+
   formLoading.value = true
   try {
     const data = {
       username: formData.username,
       email: formData.email,
       nickname: formData.nickname,
-      phone: formData.phone,
+      phone: formData.phone || null,
       status: formData.status,
       roleIds: formData.roleIds,
     }
@@ -231,6 +274,14 @@ onMounted(() => {
         用户管理
       </h1>
       <n-space>
+        <n-input
+          v-model:value="searchKeyword"
+          placeholder="搜索用户名/邮箱/昵称"
+          style="width: 220px"
+          clearable
+          @input="handleSearch"
+          @clear="handleSearch"
+        />
         <NButton @click="handleExport">
           导出
         </NButton>
@@ -255,6 +306,7 @@ onMounted(() => {
         :loading="loading"
         :row-key="row => row.id"
       />
+      <n-empty v-if="!loading && users.length === 0" description="暂无数据" mt-4 />
       <div flex justify-end mt-4>
         <n-pagination
           v-model:page="pagination.page"
@@ -272,8 +324,8 @@ onMounted(() => {
       :title="modalTitle"
       style="width: 500px"
     >
-      <n-form label-placement="left" label-width="80">
-        <n-form-item label="用户名" required>
+      <n-form ref="formRef" :model="formData" :rules="formRules" label-placement="left" label-width="80">
+        <n-form-item label="用户名" path="username">
           <n-input
             v-model:value="formData.username"
             :disabled="!!formData.id"
@@ -281,11 +333,11 @@ onMounted(() => {
           />
         </n-form-item>
 
-        <n-form-item label="邮箱" required>
+        <n-form-item label="邮箱" path="email">
           <n-input v-model:value="formData.email" placeholder="请输入邮箱" />
         </n-form-item>
 
-        <n-form-item v-if="!formData.id" label="密码" required>
+        <n-form-item v-if="!formData.id" label="密码" path="password">
           <n-input
             v-model:value="formData.password"
             type="password"
@@ -294,11 +346,11 @@ onMounted(() => {
           />
         </n-form-item>
 
-        <n-form-item label="昵称">
+        <n-form-item label="昵称" path="nickname">
           <n-input v-model:value="formData.nickname" placeholder="请输入昵称" />
         </n-form-item>
 
-        <n-form-item label="手机号">
+        <n-form-item label="手机号" path="phone">
           <n-input v-model:value="formData.phone" placeholder="请输入手机号" />
         </n-form-item>
 

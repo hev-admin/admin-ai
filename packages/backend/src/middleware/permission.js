@@ -2,10 +2,11 @@ import prisma from '../config/database.js'
 
 export function permissionMiddleware(requiredPermission) {
   return async (c, next) => {
-    const userId = c.get('userId')
+    const user = c.get('user')
+    const userId = user?.userId
 
     if (!userId) {
-      return c.json({ code: 401, message: '未登录' }, 401)
+      return c.json({ code: 401, message: '未登录', data: null }, 401)
     }
 
     // 获取用户权限
@@ -35,7 +36,7 @@ export function permissionMiddleware(requiredPermission) {
       : permissions.has(requiredPermission)
 
     if (!hasPermission) {
-      return c.json({ code: 403, message: '没有操作权限' }, 403)
+      return c.json({ code: 403, message: '没有操作权限', data: null }, 403)
     }
 
     await next()

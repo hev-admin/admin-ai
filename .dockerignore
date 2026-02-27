@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output (rebuilt inside Docker)
+dist
+**/dist
+
+# Git
+.git
+.gitignore
+
+# IDE / editor
+.vscode
+.idea
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (secrets should not be baked into images)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma generated client (regenerated during build)
+**/src/generated
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI / docs not needed in image context (docs built in stage 1)
+.github
+
+# Cache
+cache
+.cache
+
+# Test files
+**/*.test.js
+**/*.spec.js
+**/tests
+**/coverage

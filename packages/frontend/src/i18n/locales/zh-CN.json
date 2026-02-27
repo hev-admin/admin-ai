@@ -20,7 +20,16 @@
     "enable": "启用",
     "disable": "禁用",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "export": "导出",
+    "exportSuccess": "导出成功",
+    "batchDelete": "批量删除",
+    "confirmDelete": "确认删除",
+    "confirmDeleteMessage": "确定要删除吗？",
+    "sort": "排序",
+    "createdAt": "创建时间",
+    "detail": "详情",
+    "all": "全部"
   },
   "auth": {
     "login": "登录",
@@ -40,7 +49,13 @@
     "pleaseInputUsername": "请输入用户名",
     "pleaseInputPassword": "请输入密码",
     "pleaseInputEmail": "请输入邮箱",
-    "passwordNotMatch": "两次密码输入不一致"
+    "passwordNotMatch": "两次密码输入不一致",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "goLogin": "去登录",
+    "goRegister": "去注册",
+    "nickname": "昵称",
+    "pleaseInputNickname": "请输入昵称"
   },
   "menu": {
     "dashboard": "仪表盘",
@@ -54,7 +69,7 @@
   },
   "user": {
     "userManagement": "用户管理",
-    "addUser": "添加用户",
+    "addUser": "新增用户",
     "editUser": "编辑用户",
     "deleteUser": "删除用户",
     "username": "用户名",
@@ -64,23 +79,92 @@
     "status": "状态",
     "role": "角色",
     "createdAt": "创建时间",
-    "lastLogin": "最后登录"
+    "lastLogin": "最后登录",
+    "searchPlaceholder": "搜索用户名/邮箱/昵称",
+    "confirmDeleteUser": "确定要删除该用户吗？",
+    "confirmBatchDelete": "确定要删除选中的 {count} 个用户吗？",
+    "selectDeleteUsers": "请选择要删除的用户",
+    "passwordPlaceholder": "请输入密码",
+    "passwordRule": "密码至少8位，需包含大小写字母和数字",
+    "phonePlaceholder": "请输入手机号"
   },
   "role": {
     "roleManagement": "角色管理",
-    "addRole": "添加角色",
+    "addRole": "新增角色",
     "editRole": "编辑角色",
     "deleteRole": "删除角色",
     "roleName": "角色名称",
     "roleCode": "角色编码",
     "description": "描述",
-    "permissions": "权限"
+    "permissions": "菜单权限",
+    "confirmDeleteRole": "确定要删除该角色吗？",
+    "confirmBatchDelete": "确定要删除选中的 {count} 个角色吗？",
+    "selectDeleteRoles": "请选择要删除的角色",
+    "roleNamePlaceholder": "请输入角色名称",
+    "roleCodePlaceholder": "请输入角色标识"
+  },
+  "menuPage": {
+    "menuManagement": "菜单管理",
+    "addMenu": "新增菜单",
+    "editMenu": "编辑菜单",
+    "menuTitle": "菜单标题",
+    "routeName": "路由名称",
+    "routePath": "路由路径",
+    "componentPath": "组件路径",
+    "parentMenu": "上级菜单",
+    "menuType": "菜单类型",
+    "directory": "目录",
+    "menuItem": "菜单",
+    "button": "按钮",
+    "icon": "图标",
+    "redirect": "重定向",
+    "permission": "权限标识",
+    "visible": "是否可见",
+    "show": "显示",
+    "hide": "隐藏",
+    "keepAlive": "是否缓存",
+    "noParent": "无（顶级菜单）",
+    "confirmDeleteMenu": "确定要删除该菜单吗？删除后子菜单也会被删除。"
+  },
+  "log": {
+    "operationLog": "操作日志",
+    "user": "用户",
+    "module": "模块",
+    "action": "操作",
+    "requestMethod": "请求方法",
+    "requestPath": "请求路径",
+    "ipAddress": "IP 地址",
+    "userAgent": "User-Agent",
+    "duration": "耗时",
+    "time": "时间",
+    "logDetail": "日志详情",
+    "searchUsername": "搜索用户名",
+    "moduleFilter": "模块筛选",
+    "dateRange": "日期范围",
+    "statusSuccess": "成功",
+    "statusFailed": "失败"
   },
   "settings": {
     "theme": "主题",
     "language": "语言",
     "darkMode": "深色模式",
-    "lightMode": "浅色模式"
+    "lightMode": "浅色模式",
+    "systemSetting": "系统设置",
+    "siteName": "网站名称",
+    "siteDescription": "网站描述",
+    "logo": "Logo URL",
+    "copyright": "版权信息",
+    "saveSettings": "保存设置"
+  },
+  "profile": {
+    "personalCenter": "个人中心",
+    "basicInfo": "基本信息",
+    "changePassword": "修改密码",
+    "avatar": "头像",
+    "uploadAvatar": "上传头像",
+    "oldPassword": "原密码",
+    "newPassword": "新密码",
+    "confirmNewPassword": "确认新密码"
   },
   "error": {
     "notFound": "页面不存在",
@@ -88,6 +172,7 @@
     "serverError": "服务器错误",
     "networkError": "网络错误",
     "timeout": "请求超时",
-    "backToHome": "返回首页"
+    "backToHome": "返回首页",
+    "notFoundDesc": "抱歉，您访问的页面不存在"
   }
 }

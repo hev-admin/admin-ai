@@ -1,22 +1,12 @@
-// In-memory rate limiter for API endpoints
-const requestCounts = new Map()
-
-// Clean up old entries every minute
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, data] of requestCounts.entries()) {
-    if (now - data.startTime > 60000) {
-      requestCounts.delete(key)
-    }
-  }
-}, 60000)
+import { getStore } from '../utils/store.js'
 
 /**
  * Create a rate limiting middleware
  * @param {object} options
  * @param {number} options.limit - Maximum number of requests
  * @param {number} options.windowMs - Time window in milliseconds
- * @param {string} options.keyGenerator - Function to generate unique key
+ * @param {string} options.message - Error message
+ * @param {Function} options.keyGenerator - Function to generate unique key
  */
 export function rateLimiter(options = {}) {
   const {
@@ -27,17 +17,20 @@ export function rateLimiter(options = {}) {
   } = options
 
   return async (c, next) => {
-    const key = typeof keyGenerator === 'function' ? keyGenerator(c) : keyGenerator
+    const store = getStore()
+    const rawKey = typeof keyGenerator === 'function' ? keyGenerator(c) : keyGenerator
+    const key = `ratelimit:${rawKey}`
     const now = Date.now()
 
-    let data = requestCounts.get(key)
+    let data = await store.get(key)
 
     if (!data || now - data.startTime > windowMs) {
       data = { count: 1, startTime: now }
-      requestCounts.set(key, data)
+      await store.set(key, data, windowMs)
     }
     else {
       data.count++
+      await store.set(key, data, windowMs - (now - data.startTime))
     }
 
     // Set rate limit headers

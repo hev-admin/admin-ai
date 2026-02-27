@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRES_IN = '2h' // Shorter expiry for access token
 const REFRESH_TOKEN_EXPIRES_IN = '7d'
 

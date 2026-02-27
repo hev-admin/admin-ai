@@ -1,43 +1,81 @@
 # 部署指南
 
-本文档介绍如何将 Admin AI 部署到生产环境。
-
 ## 环境要求
 
 - Node.js >= 18.0.0
 - pnpm >= 9.0.0
-- 数据库（SQLite / MySQL / PostgreSQL）
 
 ## 构建项目
 
 ```bash
-# 安装依赖
 pnpm install
-
-# 构建前端
-pnpm --filter frontend build
-
-# 生成 Prisma Client
 pnpm --filter backend db:generate
+pnpm build
 ```
 
-## 前端部署
+## 环境变量
 
-### 静态文件部署
+复制 `.env.example` 并配置：
 
-前端构建后会在 `packages/frontend/dist` 目录生成静态文件，可以部署到任意静态文件服务器。
+```env
+JWT_SECRET=your-strong-production-secret-at-least-32-chars
+PORT=3001
+CORS_ORIGINS=https://your-domain.com
+NODE_ENV=production
+```
 
-#### Nginx 配置示例
+## 方式一：Docker 部署（推荐）
+
+### 使用 Docker Compose
+
+```bash
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件...
+
+# 启动服务
+docker compose up -d
+
+# 查看日志
+docker compose logs -f
+```
+
+### 使用 Dockerfile
+
+```bash
+# 构建镜像
+docker build -t admin-ai .
+
+# 运行容器
+docker run -d \
+  -p 3001:3001 \
+  -e JWT_SECRET=your-secret \
+  -e CORS_ORIGINS=https://your-domain.com \
+  -v admin-data:/app/data \
+  admin-ai
+```
+
+## 方式二：Nginx + Node.js
+
+### 前端部署
+
+构建后的静态文件在 `packages/frontend/dist` 目录。
+
+#### Nginx 配置
 
 ```nginx
 server {
     listen 80;
     server_name your-domain.com;
 
+    # 前端静态文件
     root /path/to/admin-ai/packages/frontend/dist;
     index index.html;
 
-    # 前端路由支持
+    # 开启 gzip（如果构建已生成 .gz 文件可直接使用）
+    gzip_static on;
+
+    # 前端路由 SPA
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -50,63 +88,14 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    # 静态文件上传目录
+    # 上传文件目录
     location /uploads {
         proxy_pass http://127.0.0.1:3001;
     }
 }
 ```
 
-## 后端部署
-
-### 环境变量配置
-
-在 `packages/backend` 目录创建 `.env` 文件：
-
-```env
-# 数据库连接
-DATABASE_URL="file:./prod.db"
-
-# JWT 密钥（生产环境请使用复杂随机字符串）
-JWT_SECRET="your-production-secret-key"
-
-# 服务端口
-PORT=3001
-```
-
-### 数据库配置
-
-#### SQLite（默认）
-
-```env
-DATABASE_URL="file:./prod.db"
-```
-
-#### MySQL
-
-```env
-DATABASE_URL="mysql://user:password@localhost:3306/admin_ai"
-```
-
-#### PostgreSQL
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/admin_ai"
-```
-
-### 初始化数据库
-
-```bash
-cd packages/backend
-
-# 同步数据库结构
-npx prisma db push
-
-# 填充初始数据
-node prisma/seed.js
-```
-
-### 启动服务
+### 后端部署
 
 #### 直接启动
 
@@ -115,27 +104,15 @@ cd packages/backend
 node src/index.js
 ```
 
-#### 使用 PM2
+#### PM2 管理
 
 ```bash
-# 安装 PM2
 npm install -g pm2
 
-# 启动服务
+# 启动
 pm2 start packages/backend/src/index.js --name admin-api
 
-# 查看状态
-pm2 status
-
-# 查看日志
-pm2 logs admin-api
-```
-
-#### PM2 配置文件
-
-创建 `ecosystem.config.cjs`：
-
-```javascript
+# PM2 配置文件 (ecosystem.config.cjs)
 module.exports = {
   apps: [{
     name: 'admin-api',
@@ -150,93 +127,46 @@ module.exports = {
 }
 ```
 
-启动：
+## 数据库
+
+### SQLite（默认）
+
+无需额外配置，数据库文件存储在 `packages/backend/prisma/dev.db`。
+
+### MySQL / PostgreSQL
+
+修改 `prisma/schema.prisma` 中的 datasource 和 adapter 配置，更新 `DATABASE_URL` 环境变量。
+
+### 数据库迁移
 
 ```bash
-pm2 start ecosystem.config.cjs
+cd packages/backend
+npx prisma db push      # 同步 Schema
+npx prisma db seed      # 填充数据
 ```
 
-## Docker 部署
+## CI/CD
 
-### Dockerfile
+项目内置 GitHub Actions 工作流（`.github/workflows/ci.yml`）：
 
-```dockerfile
-FROM node:18-alpine
+- 在 push 到 main 和 PR 时自动触发
+- 执行 lint、test、build
+- 使用 pnpm 缓存加速
 
-WORKDIR /app
+## 健康检查
 
-# 安装 pnpm
-RUN npm install -g pnpm
+后端提供 `/health` 端点，可用于负载均衡器健康检查：
 
-# 复制依赖文件
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages/backend/package.json ./packages/backend/
-
-# 安装依赖
-RUN pnpm install --frozen-lockfile --prod
-
-# 复制源码
-COPY packages/backend ./packages/backend
-
-# 生成 Prisma Client
-RUN cd packages/backend && npx prisma generate
-
-EXPOSE 3001
-
-CMD ["node", "packages/backend/src/index.js"]
-```
-
-### docker-compose.yml
-
-```yaml
-version: '3.8'
-
-services:
-  api:
-    build: .
-    ports:
-      - '3001:3001'
-    environment:
-      - DATABASE_URL=file:./data/prod.db
-      - JWT_SECRET=your-secret-key
-    volumes:
-      - ./data:/app/packages/backend/data
-      - ./uploads:/app/packages/backend/public/uploads
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - '80:80'
-    volumes:
-      - ./packages/frontend/dist:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - api
+```bash
+curl http://localhost:3001/health
+# {"status":"ok","timestamp":"..."}
 ```
 
 ## 安全建议
 
-1. **JWT 密钥**: 使用足够长度的随机字符串
-2. **HTTPS**: 生产环境务必启用 HTTPS
-3. **数据库**: 定期备份数据库
-4. **日志**: 配置日志轮转，避免磁盘占满
-5. **防火墙**: 仅开放必要端口
-
-## 常见问题
-
-### 数据库迁移
-
-当数据模型变更时：
-
-```bash
-cd packages/backend
-npx prisma migrate deploy
-```
-
-### 静态文件 404
-
-确保 Nginx 配置了 `try_files` 指向 `index.html`。
-
-### API 跨域问题
-
-后端已配置 CORS，如需自定义请修改 `packages/backend/src/app.js`。
+1. **JWT 密钥**：至少 32 个字符的随机字符串
+2. **HTTPS**：生产环境务必启用 SSL/TLS
+3. **数据库**：定期备份，生产环境建议使用 MySQL/PostgreSQL
+4. **日志**：配置日志轮转，避免磁盘占满
+5. **防火墙**：仅开放 80/443 端口
+6. **CORS**：仅配置实际使用的前端域名

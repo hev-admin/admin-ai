@@ -3,40 +3,59 @@ import { settingApi } from '@/api/setting.js'
 
 const message = useMessage()
 
-const settings = ref({
-  siteName: '',
-  siteDescription: '',
-  logo: '',
-  copyright: '',
-})
-
+const settings = ref([])
 const loading = ref(false)
+const saving = ref(false)
 
 async function fetchSettings() {
-  const res = await settingApi.getAll()
-  res.data.forEach((s) => {
-    if (Object.prototype.hasOwnProperty.call(settings.value, s.key)) {
-      settings.value[s.key] = s.value
+  loading.value = true
+  try {
+    const res = await settingApi.getAll()
+    if (res.data.length) {
+      settings.value = res.data.map(s => ({ ...s }))
     }
-  })
+    else {
+      // Default settings if none exist
+      settings.value = [
+        { key: 'siteName', value: '', group: 'system' },
+        { key: 'siteDescription', value: '', group: 'system' },
+        { key: 'logo', value: '', group: 'system' },
+        { key: 'copyright', value: '', group: 'system' },
+      ]
+    }
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+// 设置项的中文标签
+const labelMap = {
+  siteName: '网站名称',
+  siteDescription: '网站描述',
+  logo: 'Logo URL',
+  copyright: '版权信息',
+}
+
+function getLabel(key) {
+  return labelMap[key] || key
 }
 
 async function handleSave() {
-  loading.value = true
+  saving.value = true
   try {
-    const data = Object.entries(settings.value).map(([key, value]) => ({
-      key,
-      value,
-      group: 'system',
-    }))
-    await settingApi.save(data)
+    await settingApi.save(settings.value.map(s => ({
+      key: s.key,
+      value: s.value,
+      group: s.group || 'system',
+    })))
     message.success('保存成功')
   }
   catch (e) {
     message.error(e.message || '保存失败')
   }
   finally {
-    loading.value = false
+    saving.value = false
   }
 }
 
@@ -49,26 +68,20 @@ onMounted(fetchSettings)
       系统设置
     </h1>
 
-    <n-card style="max-width: 600px">
-      <n-form label-placement="left" label-width="80">
-        <n-form-item label="网站名称">
-          <n-input v-model:value="settings.siteName" placeholder="请输入网站名称" />
-        </n-form-item>
-        <n-form-item label="网站描述">
-          <n-input v-model:value="settings.siteDescription" placeholder="请输入网站描述" />
-        </n-form-item>
-        <n-form-item label="Logo URL">
-          <n-input v-model:value="settings.logo" placeholder="请输入Logo地址" />
-        </n-form-item>
-        <n-form-item label="版权信息">
-          <n-input v-model:value="settings.copyright" placeholder="请输入版权信息" />
-        </n-form-item>
-        <n-form-item>
-          <n-button type="primary" :loading="loading" @click="handleSave">
-            保存设置
-          </n-button>
-        </n-form-item>
-      </n-form>
-    </n-card>
+    <n-spin :show="loading">
+      <n-card style="max-width: 600px">
+        <n-form label-placement="left" label-width="80">
+          <n-form-item v-for="item in settings" :key="item.key" :label="getLabel(item.key)">
+            <n-input v-model:value="item.value" :placeholder="`请输入${getLabel(item.key)}`" />
+          </n-form-item>
+          <n-form-item>
+            <n-button type="primary" :loading="saving" @click="handleSave">
+              保存设置
+            </n-button>
+          </n-form-item>
+        </n-form>
+        <n-empty v-if="!loading && settings.length === 0" description="暂无设置项" />
+      </n-card>
+    </n-spin>
   </div>
 </template>
