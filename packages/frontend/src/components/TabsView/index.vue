@@ -85,7 +85,7 @@ function handleWheel(e) {
 <template>
   <div
     class="tabs-view"
-    flex items-end h-9 bg-gray-100 dark:bg-gray-800 select-none
+    flex items-end h-9 px-2 bg-gray-100 dark:bg-gray-800 select-none
     overflow-x-auto
     @wheel.prevent="handleWheel"
   >
@@ -146,6 +146,14 @@ function handleWheel(e) {
   </ContextMenu>
 </template>
 
+<style>
+/* 暗色模式 — 必须 unscoped 才能匹配 html.dark */
+html.dark .menu-item {
+  --menu-hover-bg: #374151;
+  --menu-disabled-color: #6b7280;
+}
+</style>
+
 <style scoped>
 .tabs-view {
   scrollbar-width: none;
@@ -157,6 +165,9 @@ function handleWheel(e) {
 }
 
 .menu-item {
+  --menu-hover-bg: #f3f4f6;
+  --menu-disabled-color: #9ca3af;
+
   padding: 6px 16px;
   font-size: 13px;
   cursor: pointer;
@@ -164,15 +175,11 @@ function handleWheel(e) {
 }
 
 .menu-item:hover:not(.disabled) {
-  background-color: var(--hover-bg, #f3f4f6);
+  background-color: var(--menu-hover-bg);
 }
 
 .menu-item.disabled {
-  color: #9ca3af;
+  color: var(--menu-disabled-color);
   cursor: not-allowed;
-}
-
-:deep(.dark) .menu-item:hover:not(.disabled) {
-  --hover-bg: #374151;
 }
 </style>

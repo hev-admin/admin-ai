@@ -64,105 +64,62 @@ defineEmits(['click', 'close', 'contextmenu'])
   </div>
 </template>
 
+<style>
+/* 暗色模式变量覆盖 — 必须 unscoped 才能匹配 html.dark 祖先选择器 */
+html.dark .tab-item {
+  --tab-bg: #374151;
+  --tab-bg-hover: #4b5563;
+  --tab-bg-active: #111827;
+  --tab-color: #9ca3af;
+  --tab-color-hover: #d1d5db;
+  --tab-color-active: #d1d5db;
+  --tab-corner-active: #111827;
+  --close-hover-bg: #4b5563;
+}
+</style>
+
 <style scoped>
 .tab-item {
-  background-color: #e5e7eb;
-  color: #6b7280;
+  --tab-bg: #e5e7eb;
+  --tab-bg-hover: #f3f4f6;
+  --tab-bg-active: #ffffff;
+  --tab-color: #6b7280;
+  --tab-color-hover: #374151;
+  --tab-color-active: #374151;
+  --tab-corner-active: #ffffff;
+  --close-hover-bg: #e5e7eb;
+
+  background-color: var(--tab-bg);
+  color: var(--tab-color);
   border-radius: 8px 8px 0 0;
-  margin: 0 1px;
+  margin: 0 -4px;
   min-width: 80px;
   height: 32px;
   z-index: 1;
 }
 
 .tab-item:hover {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--tab-bg-hover);
+  color: var(--tab-color-hover);
+  z-index: 3;
 }
 
 .tab-item.active {
-  background-color: #ffffff;
-  color: #111827;
-  z-index: 2;
+  background-color: var(--tab-bg-active);
+  color: var(--tab-color-active);
+  z-index: 5;
 }
 
 /* Chrome 风格圆角 */
-.corner-left,
+.corner-left {
+  background: radial-gradient(circle at 0 0, transparent 8px, var(--tab-corner-active) 8px);
+}
+
 .corner-right {
-  background: transparent;
-}
-
-.corner-left::before,
-.corner-right::before {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background-color: #e5e7eb;
-}
-
-.corner-left::after,
-.corner-right::after {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background-color: #ffffff;
-}
-
-.corner-left::before {
-  bottom: 0;
-  right: 0;
-}
-
-.corner-left::after {
-  bottom: 0;
-  right: 0;
-  border-radius: 0 0 8px 0;
-}
-
-.corner-right::before {
-  bottom: 0;
-  left: 0;
-}
-
-.corner-right::after {
-  bottom: 0;
-  left: 0;
-  border-radius: 0 0 0 8px;
+  background: radial-gradient(circle at 100% 0, transparent 8px, var(--tab-corner-active) 8px);
 }
 
 .close-btn:hover {
-  background-color: #e5e7eb;
-}
-
-/* 暗色模式 */
-:deep(.dark) .tab-item {
-  background-color: #374151;
-  color: #9ca3af;
-}
-
-:deep(.dark) .tab-item:hover {
-  background-color: #4b5563;
-  color: #d1d5db;
-}
-
-:deep(.dark) .tab-item.active {
-  background-color: #1f2937;
-  color: #f3f4f6;
-}
-
-:deep(.dark) .corner-left::before,
-:deep(.dark) .corner-right::before {
-  background-color: #374151;
-}
-
-:deep(.dark) .corner-left::after,
-:deep(.dark) .corner-right::after {
-  background-color: #1f2937;
-}
-
-:deep(.dark) .close-btn:hover {
-  background-color: #4b5563;
+  background-color: var(--close-hover-bg);
 }
 </style>
