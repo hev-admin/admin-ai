@@ -1,9 +1,13 @@
 <script setup>
 import { usePermissionStore } from '@/stores/permission.js'
+import { useThemeStore } from '@/stores/theme.js'
 
 defineProps({
   collapsed: Boolean,
 })
+
+const themeStore = useThemeStore()
+const isDark = computed(() => themeStore.theme === 'dark')
 
 const route = useRoute()
 const router = useRouter()
@@ -53,15 +57,14 @@ onMounted(() => {
 
 <template>
   <aside
-    bg-gray-800
-    text-white
     transition-all
     duration-300
+    class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-r border-gray-200 dark:border-gray-700"
     :class="collapsed ? 'w-16' : 'w-60'"
   >
-    <div h-14 flex items-center justify-center border-b border-gray-700>
-      <span v-if="!collapsed" text-xl font-bold>Admin AI</span>
-      <span v-else text-xl font-bold>A</span>
+    <div h-14 flex items-center justify-center border-b class="border-gray-200 dark:border-gray-700">
+      <span v-if="!collapsed" text-xl font-bold class="text-gray-800 dark:text-white">Admin AI</span>
+      <span v-else text-xl font-bold class="text-gray-800 dark:text-white">A</span>
     </div>
     <n-menu
       :value="activeKey"
@@ -69,7 +72,7 @@ onMounted(() => {
       :collapsed="collapsed"
       :collapsed-width="64"
       :collapsed-icon-size="22"
-      inverted
+      :inverted="isDark"
       @update:value="handleMenuSelect"
     />
   </aside>
