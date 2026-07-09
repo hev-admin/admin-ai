@@ -1,0 +1,32 @@
+{
+  "name": "@admin-ai/server",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "description": "admin-ai 后端：Hono API 服务",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:seed:mongo": "node seed/mongo.js"
+  },
+  "dependencies": {
+    "@admin-ai/request": "workspace:*",
+    "@hono/node-server": "^2.0.8",
+    "@hono/zod-validator": "^0.8.0",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@prisma/client-runtime-utils": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "dotenv": "^17.4.2",
+    "hono": "^4.12.28",
+    "mongodb": "^7.5.0",
+    "prisma": "^7.8.0",
+    "zod": "^4.4.3"
+  }
+}

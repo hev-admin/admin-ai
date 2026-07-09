@@ -1,0 +1,31 @@
+shellEmulator: true
+
+trustPolicy: no-downgrade
+
+# 定点豁免（不放宽整体策略）：vitepress 1.6.4 依赖的 vite 5.x 末版为安全回移
+# （2025-10-20 发布），维护分支发布通道与主线不同，信任证据由 trusted publisher
+# 变为 provenance attestation，触发 no-downgrade 误报（pnpm#10164 描述的典型场景）
+trustPolicyExclude:
+  - vite@5.4.21
+
+packages:
+  - apps/*
+  - packages/*
+
+# 弱网容忍：拉取超时与重试放宽
+fetchTimeout: 300000
+fetchRetries: 5
+
+# 允许执行安装/构建脚本的依赖（pnpm 默认阻止 postinstall）
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  better-sqlite3: true
+  esbuild: true
+  prisma: true
+
+# 定点豁免最低发布龄：升级当日（2026-07-16）二者最新版发布均不足 48h
+# （pinia 4.x 首发 07-14、vue-router 5.2.0 发布 07-15），由 pnpm 安装时自动记录
+minimumReleaseAgeExclude:
+  - pinia@4.0.2
+  - vue-router@5.2.0

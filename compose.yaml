@@ -1,0 +1,26 @@
+# admin-ai 容器编排（M7）：默认单服务（SQLite 数据卷）；MongoDB 模式经 profile 启用。
+# 快速启动：JWT_SECRET=<强随机值> docker compose up -d
+# mongo 模式：打开下方两行环境变量注释后
+#   docker compose --profile mongo up -d
+#   docker compose exec app node /app/apps/server/seed/mongo.js   # 手动一次性播种
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?生产必改项——请在 .env 或环境中提供强随机 JWT_SECRET}
+      # DB_DRIVER: mongo                      # 启用 mongo profile 时打开
+      # MONGODB_URL: mongodb://mongo:27017    # 服务名指向 compose 内 mongo 服务
+    volumes:
+      - app-data:/data
+
+  mongo:
+    image: mongo:7
+    profiles: [mongo]
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  app-data:
+  mongo-data:

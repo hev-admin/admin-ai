@@ -1,0 +1,78 @@
+# 最小 CI（M6 #40，评审整改 P2）：install → generate → lint → test → build 单 job 门禁。
+# mongo 服务容器使 repository 契约测试在 CI 内双驱动全量运行（本地默认仅 prisma，
+# 经 RUN_MONGO_TESTS=1 门控，见 apps/server/tests/repo-contract.mongo.test.js）。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 版本读取根 package.json 的 packageManager 字段，与本地一致
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 生成 Prisma Client
+        run: pnpm --filter @admin-ai/server exec prisma generate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: 测试（含 mongo 契约套件）
+        run: pnpm test
+        env:
+          RUN_MONGO_TESTS: '1'
+          MONGODB_URL: mongodb://localhost:27017
+          MONGODB_DB: admin_ai_test
+
+      - name: 构建 web（验证 safelist 派生与产物）
+        run: pnpm --filter @admin-ai/web build
+
+  # 镜像构建校验（M7 #47）：验证 Dockerfile 随代码演进不腐化，仅构建不推送，
+  # 构建后起容器探测 /api/health 作为最小运行时冒烟（首启自迁移 + 播种）。
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: 构建镜像（GHA 层缓存，不推送）
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: admin-ai:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 运行时冒烟（首启迁移播种 + 健康检查）
+        run: |
+          docker run -d --name admin-ai-ci -e JWT_SECRET=ci-smoke-secret -p 3000:3000 admin-ai:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/health >/dev/null 2>&1; then
+              echo "health ok"; ok=1; break
+            fi
+            sleep 2
+          done
+          docker logs admin-ai-ci
+          docker rm -f admin-ai-ci >/dev/null
+          [ "$ok" = "1" ] || { echo "健康检查未通过"; exit 1; }

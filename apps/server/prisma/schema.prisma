@@ -1,0 +1,53 @@
+// admin-ai 关系库数据模型（单一数据源，字段语义见 REQUIREMENTS §4.4）
+// 约定：不使用 @db.* 原生类型注解，保证 SQLite / PostgreSQL / MySQL 跨库可移植；
+// 主键统一为字符串 cuid；createdAt / updatedAt 由数据层统一维护。
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  nickname  String
+  email     String?
+  avatar    String?
+  status    Int      @default(1)
+  roles     Role[]   @relation("UserRoles")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  remark    String?
+  users     User[]   @relation("UserRoles")
+  menus     Menu[]   @relation("RoleMenus")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Menu {
+  id         String   @id @default(cuid())
+  parentId   String?
+  type       Int
+  name       String
+  path       String?
+  component  String?
+  icon       String?
+  permission String?
+  sort       Int      @default(0)
+  hidden     Boolean  @default(false)
+  keepAlive  Boolean  @default(false)
+  roles      Role[]   @relation("RoleMenus")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

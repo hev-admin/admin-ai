@@ -1,0 +1,23 @@
+// 个人中心文案
+export const profile = {
+  'profile.basicInfo': '基本资料',
+  'profile.username': '登录账号',
+  'profile.nickname': '昵称',
+  'profile.nicknameRequired': '昵称不能为空',
+  'profile.email': '邮箱',
+  'profile.avatar': '头像地址',
+  'profile.avatarHint': '头像图片 URL（本期不做上传）',
+  'profile.roles': '角色',
+  'profile.save': '保存修改',
+  'profile.saved': '资料已更新',
+  'profile.changePwd': '修改密码',
+  'profile.oldPassword': '旧密码',
+  'profile.oldPwdRequired': '请输入旧密码',
+  'profile.newPassword': '新密码',
+  'profile.newPwdRequired': '请输入新密码',
+  'profile.confirmPassword': '确认新密码',
+  'profile.confirmPwdRequired': '请再次输入新密码',
+  'profile.pwdHint': '至少 6 位',
+  'profile.pwdMismatch': '两次输入的新密码不一致',
+  'profile.pwdChanged': '密码已修改，请重新登录',
+}

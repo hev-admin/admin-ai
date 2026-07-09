@@ -1,0 +1,23 @@
+// Profile page texts
+export const profile = {
+  'profile.basicInfo': 'Basic Info',
+  'profile.username': 'Account',
+  'profile.nickname': 'Nickname',
+  'profile.nicknameRequired': 'Nickname is required',
+  'profile.email': 'Email',
+  'profile.avatar': 'Avatar URL',
+  'profile.avatarHint': 'Image URL (upload not included in this phase)',
+  'profile.roles': 'Roles',
+  'profile.save': 'Save Changes',
+  'profile.saved': 'Profile updated',
+  'profile.changePwd': 'Change Password',
+  'profile.oldPassword': 'Current Password',
+  'profile.oldPwdRequired': 'Please enter current password',
+  'profile.newPassword': 'New Password',
+  'profile.newPwdRequired': 'Please enter new password',
+  'profile.confirmPassword': 'Confirm New Password',
+  'profile.confirmPwdRequired': 'Please confirm new password',
+  'profile.pwdHint': 'At least 6 characters',
+  'profile.pwdMismatch': 'The two passwords do not match',
+  'profile.pwdChanged': 'Password changed, please sign in again',
+}

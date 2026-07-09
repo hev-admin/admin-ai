@@ -1,0 +1,27 @@
+{
+  "name": "admin-ai",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.11.0",
+  "description": "基于 pnpm monorepo 的通用后台管理模板：Vue 3 + Hono + Prisma",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @admin-ai/web --filter @admin-ai/server run dev",
+    "dev:web": "pnpm --filter @admin-ai/web run dev",
+    "dev:server": "pnpm --filter @admin-ai/server run dev",
+    "dev:docs": "pnpm --filter @admin-ai/docs run dev",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@unocss/eslint-plugin": "^66.7.5",
+    "eslint": "^10.6.0",
+    "eslint-plugin-format": "^2.0.1"
+  }
+}
